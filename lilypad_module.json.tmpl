@@ -1,0 +1,46 @@
+{
+  "machine": {
+    "gpu": 1,
+    "cpu": 8000,
+    "ram": 16000
+  },
+  "job": {
+    "APIVersion": "V1beta1",
+    "Spec": {
+      "Deal": {
+        "Concurrency": 1
+      },
+      "Docker": {
+        "Entrypoint": [
+            "/app/run_model.sh",
+            {{ buildJson (dict 
+              "messages" (default (list (dict "role" "user" "content" "What is bitcoin?")) .Messages)
+              "temperature" (default 0.7 .Temperature)
+              "max_tokens" (default 2048 .MaxTokens)
+            ) | quote }}
+        ],
+        "Image": "narbs91/lilypad-ollama-${MODEL_NAME}:latest"
+      },
+      "Engine": "Docker",
+      "Network": {
+        "Type": "None"
+      },
+      "Outputs": [
+        {
+          "Name": "outputs",
+          "Path": "/outputs"
+        }
+      ],
+      "PublisherSpec": {
+        "Type": "IPFS"
+      },
+      "Resources": {
+        "GPU": "1",
+        "cpu": "8",
+        "memory": "16Gb"
+      },
+      "Timeout": 1800,
+      "Verifier": "Noop"
+    }
+  }
+}
