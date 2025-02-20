@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Common Ollama models:"
+echo "  - llama2:7b"
+echo "  - mistral:7b"
+echo "  - codellama:7b"
+echo "  - neural-chat:7b"
+echo "  - dolphin-phi:2.7b"
+echo "  - phi:2.7b"
+echo "  - orca-mini:3b"
+echo ""
+echo "For more models, visit: https://ollama.ai/library" 

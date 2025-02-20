@@ -33,8 +33,8 @@ RUN mkdir -p /outputs && chmod 777 /outputs
 VOLUME /app/outputs
 
 # Copy a script to start ollama and handle input
-COPY run_model.sh /app/run_model.sh
-RUN chmod +x /app/run_model.sh
+COPY model.sh /app/model.sh
+RUN chmod +x /app/model.sh
 
 # Set the entrypoint to the script
-ENTRYPOINT ["/app/run_model.sh"]
+ENTRYPOINT ["/app/model.sh"]

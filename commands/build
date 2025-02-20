@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ./stack build <model_name> <version>"
+    echo "Example: ./stack build llama2 7b"
+    exit 1
+fi
+
+MODEL_NAME=$1
+MODEL_VERSION=$2
+IMAGE_NAME="lilypad-ollama-${MODEL_NAME}-${MODEL_VERSION}"
+
+echo "Building $IMAGE_NAME with $MODEL_NAME:$MODEL_VERSION..."
+
+docker buildx build --platform linux/amd64 \
+  --build-arg MODEL_NAME="$MODEL_NAME" \
+  --build-arg MODEL_VERSION="$MODEL_VERSION" \
+  -t "$IMAGE_NAME:latest" .
+
+echo "Build complete!"
+echo "To test: ./stack run $IMAGE_NAME:latest '{\"messages\": [{\"role\": \"user\", \"content\": \"Hello!\"}]}'"
+echo "To push: ./stack push $IMAGE_NAME:latest" 

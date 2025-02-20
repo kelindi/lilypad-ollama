@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ./stack push <image_name>"
+    echo "Example: ./stack push lilypad-ollama-llama2-7b:latest"
+    exit 1
+fi
+
+# Source configuration
+CONFIG_FILE="$HOME/.lilypad-ollama/config"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Please configure your Docker Hub username first:"
+    echo "./stack configure <dockerhub-username>"
+    exit 1
+fi
+source "$CONFIG_FILE"
+
+IMAGE_NAME=$1
+
+# Remove the :latest suffix if present
+BASE_IMAGE_NAME=${IMAGE_NAME%:latest}
+
+# Create template file name from image name
+template_file="${BASE_IMAGE_NAME}.json.tmpl"
+
+# Create model-specific template file
+cp lilypad_module.json.tmpl "$template_file"
+
+# Update the Docker image path in the template
+sed -i "s|\"Image\": \"narbs91/lilypad-ollama-\${MODEL_NAME}|\"Image\": \"${DOCKER_HUB_USERNAME}/${BASE_IMAGE_NAME}|g" "$template_file"
+
+echo "Pushing $IMAGE_NAME to Docker Hub as $DOCKER_HUB_USERNAME/$IMAGE_NAME..."
+docker tag "$IMAGE_NAME" "$DOCKER_HUB_USERNAME/$IMAGE_NAME"
+docker push "$DOCKER_HUB_USERNAME/$IMAGE_NAME"
+
+echo "Generated model-specific template: $template_file" 

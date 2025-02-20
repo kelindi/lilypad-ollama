@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Locally built Lilypad Ollama images:"
+docker images | grep "lilypad-ollama-" | awk '{printf "  - %-40s %-20s %-20s\n", $1, $2, $3}' 

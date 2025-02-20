@@ -1,0 +1,28 @@
+#!/bin/bash
+
+COMMAND=$1
+shift
+
+# Only source config for commands that need Docker Hub username
+if [ "$COMMAND" = "push" ] || [ "$COMMAND" = "build" ]; then
+    CONFIG_FILE="$HOME/.lilypad-ollama/config"
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo "Please configure your Docker Hub username first:"
+        echo "./stack configure <dockerhub-username>"
+        exit 1
+    fi
+    source "$CONFIG_FILE"
+fi
+
+if [ -f "commands/$COMMAND" ]; then
+    "commands/$COMMAND" "$@"
+else
+    echo "Available commands:"
+    echo "  configure <username>            Set your Docker Hub username"
+    echo "  build <model_name> <version>    Build a new model image"
+    echo "  run <image_name> <json_input>   Run the model locally"
+    echo "  push <image_name>               Push to Docker Hub"
+    echo "  images                          List locally built images"
+    echo "  list                            List available Ollama models"
+    exit 1
+fi 

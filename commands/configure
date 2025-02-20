@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: ./stack configure <dockerhub-username>"
+    echo "Example: ./stack configure alice123"
+    exit 1
+fi
+
+DOCKER_USERNAME=$1
+CONFIG_DIR="$HOME/.lilypad-ollama"
+CONFIG_FILE="$CONFIG_DIR/config"
+
+# Create config directory if it doesn't exist
+mkdir -p "$CONFIG_DIR"
+
+# Save Docker Hub username to config file
+echo "DOCKER_HUB_USERNAME=$DOCKER_USERNAME" > "$CONFIG_FILE"
+
+echo "Configuration saved! Docker Hub username set to: $DOCKER_USERNAME" 

@@ -2,10 +2,12 @@
 
 if [ "$#" -ne 2 ]; then
     echo "Usage: ./stack run <image_name> <json_input>"
+    echo "Example: ./stack run lilypad-ollama-llama2:latest '{\"messages\": [{\"role\": \"user\", \"content\": \"Hello!\"}]}'"
     exit 1
 fi
 
 IMAGE_NAME=$1
 JSON_INPUT=$2
 
+echo "Running $IMAGE_NAME..."
 docker run "$IMAGE_NAME" "$JSON_INPUT" 
