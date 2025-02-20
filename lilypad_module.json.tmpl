@@ -13,11 +13,13 @@
       "Docker": {
         "Entrypoint": [
             "/app/run_model.sh",
-            {{ buildJson (dict 
-              "messages" (default (list (dict "role" "user" "content" "What is bitcoin?")) .Messages)
-              "temperature" (default 0.7 .Temperature)
-              "max_tokens" (default 2048 .MaxTokens)
-            ) | quote }}
+            {{ if .Messages }}
+              {{ printf "%s" (toJson .Messages) | quote }}
+            {{ else }}
+              "[{\"role\":\"user\",\"content\":\"What is bitcoin?\"}]"
+            {{ end }},
+            {{ if .Temperature }}{{ .Temperature }}{{ else }}0.7{{ end }},
+            {{ if .MaxTokens }}{{ .MaxTokens }}{{ else }}2048{{ end }}
         ],
         "Image": "narbs91/lilypad-ollama-${MODEL_NAME}:latest"
       },
