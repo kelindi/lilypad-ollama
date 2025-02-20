@@ -12,16 +12,14 @@
       },
       "Docker": {
         "Entrypoint": [
-            "/app/run_model.sh",
+            "/app/model.sh",
             {{ if .Messages }}
-              {{ printf "%s" (toJson .Messages) | quote }}
+              "{\"messages\":{{ .Messages }},\"temperature\":{{ if .Temperature }}{{ .Temperature }}{{ else }}0.7{{ end }},\"max_tokens\":{{ if .MaxTokens }}{{ .MaxTokens }}{{ else }}2048{{ end }}}"
             {{ else }}
-              "[{\"role\":\"user\",\"content\":\"What is bitcoin?\"}]"
-            {{ end }},
-            {{ if .Temperature }}{{ .Temperature }}{{ else }}0.7{{ end }},
-            {{ if .MaxTokens }}{{ .MaxTokens }}{{ else }}2048{{ end }}
+              "{\"messages\":[{\"role\":\"user\",\"content\":\"What is bitcoin?\"}],\"temperature\":0.7,\"max_tokens\":2048}"
+            {{ end }}
         ],
-        "Image": "narbs91/lilypad-ollama-${MODEL_NAME}:latest"
+        "Image": "kelindi/lilypad-ollama-deepseek-r1-1.5b"
       },
       "Engine": "Docker",
       "Network": {

@@ -15,19 +15,44 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 source "$CONFIG_FILE"
 
+# Check if template exists
+if [ ! -f "lilypad_module.json.tmpl" ]; then
+    echo "Error: lilypad_module.json.tmpl not found!"
+    exit 1
+fi
+
+# Debug: Show template content
+echo "Template content:"
+cat lilypad_module.json.tmpl
+
 IMAGE_NAME=$1
 
 # Remove the :latest suffix if present
 BASE_IMAGE_NAME=${IMAGE_NAME%:latest}
 
+# Extract the model name from the image name (everything after lilypad-ollama-)
+MODEL_NAME=${BASE_IMAGE_NAME#lilypad-ollama-}
+
 # Create template file name from image name
 template_file="${BASE_IMAGE_NAME}.json.tmpl"
 
-# Create model-specific template file
-cp lilypad_module.json.tmpl "$template_file"
+# Create the full Docker image path
+DOCKER_IMAGE="${DOCKER_HUB_USERNAME}/${IMAGE_NAME}"
 
-# Update the Docker image path in the template
-sed -i "s|\"Image\": \"narbs91/lilypad-ollama-\${MODEL_NAME}|\"Image\": \"${DOCKER_HUB_USERNAME}/${BASE_IMAGE_NAME}|g" "$template_file"
+# Debug: Show variables
+echo "Variables to be substituted:"
+echo "MODEL_NAME=$MODEL_NAME"
+echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME"
+echo "DOCKER_IMAGE=$DOCKER_IMAGE"
+
+# Copy template and substitute variables
+cp "lilypad_module.json.tmpl" "$template_file"
+sed -i '' "s|\${MODEL_NAME}|${MODEL_NAME}|g" "$template_file"
+sed -i '' "s|\${DOCKER_HUB_USERNAME}|${DOCKER_HUB_USERNAME}|g" "$template_file"
+
+# Debug: Show generated file
+echo "Generated template content:"
+cat "$template_file"
 
 echo "Pushing $IMAGE_NAME to Docker Hub as $DOCKER_HUB_USERNAME/$IMAGE_NAME..."
 docker tag "$IMAGE_NAME" "$DOCKER_HUB_USERNAME/$IMAGE_NAME"
