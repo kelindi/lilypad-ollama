@@ -1,0 +1,46 @@
+{
+  "machine": {
+    "gpu": 1,
+    "cpu": 8000,
+    "ram": 16000
+  },
+  "job": {
+    "APIVersion": "V1beta1",
+    "Spec": {
+      "Deal": {
+        "Concurrency": 1
+      },
+      "Docker": {
+        "Entrypoint": [
+          "/app/model.sh",
+          {{ if .Base64Input }}
+            {{ .Base64Input }}
+          {{ else }}
+            "{{`eyJtZXNzYWdlcyI6W3sicm9sZSI6InVzZXIiLCJjb250ZW50IjoiV2hhdCBpcyBiaXRjb2luPyJ9XSwidGVtcGVyYXR1cmUiOjAuNywibWF4X3Rva2VucyI6MjA0OH0=`}}"
+          {{ end }}
+        ],
+        "Image": "kelindi/lilypad-ollama-deepseek-r1-1.5b"
+      },
+      "Engine": "Docker",
+      "Network": {
+        "Type": "None"
+      },
+      "Outputs": [
+        {
+          "Name": "outputs",
+          "Path": "/outputs"
+        }
+      ],
+      "PublisherSpec": {
+        "Type": "IPFS"
+      },
+      "Resources": {
+        "GPU": "1",
+        "cpu": "8",
+        "memory": "16Gb"
+      },
+      "Timeout": 1800,
+      "Verifier": "Noop"
+    }
+  }
+}
