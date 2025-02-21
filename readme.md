@@ -33,7 +33,8 @@ Example:
 ├── stack                  # Main command runner
 └── stack/commands/        # Individual command implementations
     ├── build
-    ├── generate-readme
+    ├── configure
+    ├── images
     ├── list
     ├── push
     └── run
