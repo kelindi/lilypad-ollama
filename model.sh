@@ -66,7 +66,7 @@ echo "$request" | jq '.' || echo "Failed to parse request as JSON" >&2
 
 # Make the API call to Ollama's chat endpoint with more debugging
 echo "Making request to Ollama..." >&2
-response=$(curl -v -X POST http://localhost:11434/api/chat \
+response=$(curl -v -X POST http://127.0.0.1:11434/api/chat \
   -H "Content-Type: application/json" \
   -d "$request" 2>&1)
 
@@ -84,7 +84,12 @@ echo "$response"
   echo "=== Server Status ==="
   echo "Ollama version: $(ollama --version)"
   echo "Model list: $(ollama list)"
-  echo "Server health check: $(curl -s http://localhost:11434)"
+  echo "Server health check: $(curl -s http://127.0.0.1:11434)"
+  echo "=== Network Status ==="
+  echo "Hosts file:"
+  cat /etc/hosts
+  echo "Network interfaces:"
+  ip addr
 } > "/outputs/debug.log"
 
 # Save raw response to outputs
