@@ -5,16 +5,16 @@ mkdir -p /outputs
 
 # Parse base64 input argument and decode to JSON
 echo "Raw input (base64): $1" >&2
-input_json=$(echo "$1" | base64 -d)
+input_json=$(echo "$1" | base64 -d || echo "{}")
 
 # Debug: Print decoded input
 echo "Decoded input:" >&2
-echo "$input_json" | jq '.' >&2
+echo "$input_json" | jq '.' || echo "Failed to parse decoded input as JSON" >&2
 
-# Extract values from input JSON
-messages=$(echo "$input_json" | jq -r '.messages')
-temperature=$(echo "$input_json" | jq -r '.temperature')
-max_tokens=$(echo "$input_json" | jq -r '.max_tokens')
+# Extract values from input JSON with defaults
+messages=$(echo "$input_json" | jq -r '.messages // empty' || echo '[{"role":"user","content":"What is bitcoin?"}]')
+temperature=$(echo "$input_json" | jq -r '.temperature // empty' || echo "0.7")
+max_tokens=$(echo "$input_json" | jq -r '.max_tokens // empty' || echo "2048")
 
 echo "Extracted values:" >&2
 echo "messages: $messages" >&2
@@ -45,30 +45,26 @@ EOF
 
 # Debug: Print the request
 echo "Sending request to Ollama:" >&2
-echo "$request" | jq '.' >&2
+echo "$request" | jq '.' || echo "Failed to parse request as JSON" >&2
 
-# Make the API call to Ollama's chat endpoint and capture both stdout and stderr
-response=$(curl -v -X POST http://localhost:11434/api/chat \
+# Make the API call to Ollama's chat endpoint
+response=$(curl -s -X POST http://localhost:11434/api/chat \
   -H "Content-Type: application/json" \
-  -d "$request" 2>&1)
+  -d "$request")
 
-# Debug: Print raw response and curl output
-echo "Complete curl output:" >&2
-echo "$response" >&2
-
-# Try to extract just the response body
-response_body=$(echo "$response" | grep -v "^*" | grep -v "^>" | grep -v "^<" | grep -v "^}" | grep -v "^{" | tr -d '\n')
-echo "Extracted response body:" >&2
-echo "$response_body" | jq '.' >&2
+# Debug: Print raw response
+echo "Raw response from Ollama:" >&2
+echo "$response"
+echo "Response as JSON:" >&2
+echo "$response" | jq '.' || echo "Failed to parse response as JSON" >&2
 
 # Save debug info
 {
   echo "=== Debug Info ===" 
   echo "Input (base64): $1"
   echo "Decoded input: $input_json"
-  echo "Request: $request"
-  echo "Raw response: $response"
-  echo "Response body: $response_body"
+  echo "Request to Ollama: $request"
+  echo "Response from Ollama: $response"
 } > "/outputs/debug.log"
 
 # Save raw response to outputs
