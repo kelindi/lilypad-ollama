@@ -9,5 +9,11 @@ fi
 IMAGE_NAME=$1
 JSON_INPUT=$2
 
+# Base64 encode the input
+BASE64_INPUT=$(echo "$JSON_INPUT" | base64)
+
 echo "Running $IMAGE_NAME..."
-docker run "$IMAGE_NAME" "$JSON_INPUT" 
+echo "Original input: $JSON_INPUT"
+echo "Base64 encoded: $BASE64_INPUT"
+
+docker run "$IMAGE_NAME" "$BASE64_INPUT" 

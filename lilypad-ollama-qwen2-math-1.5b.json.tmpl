@@ -13,10 +13,10 @@
       "Docker": {
         "Entrypoint": [
           "/app/model.sh",
-          {{ if .Input }}
-            {{ .Input }}
+          {{ if .Base64Input }}
+            {{ .Base64Input }}
           {{ else }}
-            "{{`{\"messages\":[{\"role\":\"user\",\"content\":\"What is bitcoin?\"}],\"temperature\":0.7,\"max_tokens\":2048}`}}"
+            "{{`eyJtZXNzYWdlcyI6W3sicm9sZSI6InVzZXIiLCJjb250ZW50IjoiV2hhdCBpcyBiaXRjb2luPyJ9XSwidGVtcGVyYXR1cmUiOjAuNywibWF4X3Rva2VucyI6MjA0OH0=`}}"
           {{ end }}
         ],
         "Image": "kelindi/lilypad-ollama-deepseek-r1-1.5b"

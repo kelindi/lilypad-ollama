@@ -3,8 +3,12 @@
 # Create output directory if it doesn't exist
 mkdir -p /outputs
 
-# Parse input JSON argument
-input_json="$1"
+# Parse base64 input argument and decode to JSON
+input_json=$(echo "$1" | base64 -d)
+
+# Debug: Print decoded input
+echo "Decoded input:" >&2
+echo "$input_json" | jq '.' >&2
 
 # Extract values from input JSON
 messages=$(echo "$input_json" | jq -r '.messages')
@@ -31,36 +35,20 @@ request=$(cat <<EOF
 EOF
 )
 
+# Debug: Print the request
+echo "Sending request to Ollama:" >&2
+echo "$request" | jq '.' >&2
+
 # Make the API call to Ollama's chat endpoint
 response=$(curl -s -X POST http://localhost:11434/api/chat \
   -H "Content-Type: application/json" \
   -d "$request")
 
-# Get Unix timestamp for 'created' field
-created=$(date +%s)
+# Debug: Print raw response and save it
+echo "Raw response from Ollama:"
+echo "$response" | jq '.'
 
-# Create JSON structure following OpenAI format
-json_output="{
-    \"id\": \"chatcmpl-$(openssl rand -hex 12)\",
-    \"object\": \"chat.completion\",
-    \"created\": $created,
-    \"model\": \"$MODEL_ID\",
-    \"choices\": [{
-        \"index\": 0,
-        \"message\": $(echo "$response" | jq '.message'),
-        \"finish_reason\": \"stop\"
-    }],
-    \"usage\": {
-        \"prompt_tokens\": null,
-        \"completion_tokens\": null,
-        \"total_tokens\": null
-    }
-}"
-
-# Write JSON to file
-echo "$json_output" > "/outputs/response.json"
-
-# Print the response
-echo "$json_output"
+# Save raw response to outputs
+echo "$response" > "/outputs/raw_response.json"
 
 exit 0 
