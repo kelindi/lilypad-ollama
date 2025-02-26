@@ -7,11 +7,6 @@ mkdir -p /outputs
 echo "Raw input (base64): $1" >&2
 input_json=$(echo "$1" | base64 -d || echo "{}")
 
-# Extract values from input JSON with defaults
-messages=$(echo "$input_json" | jq -r '.messages // empty' || echo '[{"role":"user","content":"What is bitcoin?"}]')
-temperature=$(echo "$input_json" | jq -r '.temperature // empty' || echo "0.7")
-max_tokens=$(echo "$input_json" | jq -r '.max_tokens // empty' || echo "2048")
-
 # Start the ollama server in the background
 echo "Starting Ollama server..." >&2
 nohup bash -c "ollama serve &" >&2
@@ -32,17 +27,18 @@ done
 
 echo "Ollama server started" >&2
 
-# Prepare the chat completion request
-request=$(cat <<EOF
-{
-  "model": "$MODEL_ID",
-  "messages": $messages,
-  "temperature": $temperature,
-  "max_tokens": $max_tokens,
-  "stream": false
-}
-EOF
-)
+# Set default values only if they don't exist in the input
+# This preserves all original parameters while ensuring required ones exist
+request=$(echo "$input_json" | jq '
+  # Set defaults only if fields are missing
+  . + {
+    model: (.model // "'$MODEL_ID'"),
+    messages: (.messages // [{"role":"user","content":"What is bitcoin?"}]),
+    temperature: (.temperature // 0.7),
+    max_tokens: (.max_tokens // 2048),
+    stream: false
+  }
+')
 
 # Make the API call to Ollama's chat endpoint
 echo "Making request to Ollama..." >&2

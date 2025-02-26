@@ -13,13 +13,13 @@
       "Docker": {
         "Entrypoint": [
           "/app/model.sh",
-          {{ if .Base64Input }}
-            {{ .Base64Input }}
+          {{ if .Prompt }}
+            {{ .Prompt }}
           {{ else }}
-            "{{`eyJtZXNzYWdlcyI6W3sicm9sZSI6InVzZXIiLCJjb250ZW50IjoiV2hhdCBpcyBiaXRjb2luPyJ9XSwidGVtcGVyYXR1cmUiOjAuNywibWF4X3Rva2VucyI6MjA0OH0=`}}"
+            "eyJtZXNzYWdlcyI6W3sicm9sZSI6InVzZXIiLCJjb250ZW50IjoiV2hhdCBpcyBiaXRjb2luPyJ9XSwidGVtcGVyYXR1cmUiOjAuNywibWF4X3Rva2VucyI6MjA0OH0="
           {{ end }}
         ],
-        "Image": "kelindi/lilypad-ollama-deepseek-r1-1.5b"
+        "Image": "kelindi/lilypad-ollama-llama3.1-8b:latest"
       },
       "Engine": "Docker",
       "Network": {
