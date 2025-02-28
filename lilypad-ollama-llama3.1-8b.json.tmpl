@@ -12,12 +12,7 @@
       },
       "Docker": {
         "Entrypoint": [
-          "/app/model.sh",
-          {{ if .Prompt }}
-            {{ .Prompt }}
-          {{ else }}
-            "eyJtZXNzYWdlcyI6W3sicm9sZSI6InVzZXIiLCJjb250ZW50IjoiV2hhdCBpcyBiaXRjb2luPyJ9XSwidGVtcGVyYXR1cmUiOjAuNywibWF4X3Rva2VucyI6MjA0OH0="
-          {{ end }}
+          "/app/model.sh", {{ .request }}
         ],
         "Image": "kelindi/lilypad-ollama-llama3.1-8b:latest"
       },
