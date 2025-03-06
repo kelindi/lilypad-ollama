@@ -27,22 +27,26 @@ done
 
 echo "Ollama server started" >&2
 
-# Set default values only if they don't exist in the input
-# This preserves all original parameters while ensuring required ones exist
+# Use the OpenAI-compatible endpoint
+endpoint="/v1/chat/completions"
+
+# Pass through the input JSON, only setting essential defaults
 request=$(echo "$input_json" | jq '
-  # Set defaults only if fields are missing
+  # Set essential defaults if missing
   . + {
     model: (.model // "'$MODEL_ID'"),
     messages: (.messages // [{"role":"user","content":"What is bitcoin?"}]),
-    temperature: (.temperature // 0.7),
-    max_tokens: (.max_tokens // 2048),
     stream: false
   }
 ')
 
-# Make the API call to Ollama's chat endpoint
+# Log the request for debugging
+echo "Using OpenAI-compatible endpoint: $endpoint" >&2
+echo "Request: $request" >&2
+
+# Make the API call to Ollama using the OpenAI-compatible endpoint
 echo "Making request to Ollama..." >&2
-response=$(curl -s http://127.0.0.1:11434/api/chat/completions \
+response=$(curl -s "http://127.0.0.1:11434$endpoint" \
   -H "Content-Type: application/json" \
   -d "$request")
 
@@ -51,16 +55,16 @@ response=$(curl -s http://127.0.0.1:11434/api/chat/completions \
   echo "=== Debug Info ===" 
   echo "Input (base64): $1"
   echo "Decoded input: $input_json"
-  echo "Request to Ollama: $request"
-  echo "Response from Ollama: "
+  echo "Endpoint used: $endpoint"
+  echo "Request: $request"
+  echo "Response: "
   echo "$response"
   echo "=== Server Status ==="
   echo "Ollama version: $(ollama --version)"
   echo "Model list: $(ollama list)"
-  echo "Server health check: $(curl -s http://127.0.0.1:11434)"
 } > "/outputs/debug.log"
 
-# Save and output the raw Ollama response
+# Save and output the response
 echo "$response" > "/outputs/response.json"
 echo "$response"
 
