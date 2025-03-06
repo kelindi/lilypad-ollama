@@ -42,7 +42,7 @@ request=$(echo "$input_json" | jq '
 
 # Make the API call to Ollama's chat endpoint
 echo "Making request to Ollama..." >&2
-response=$(curl -s http://127.0.0.1:11434/api/chat \
+response=$(curl -s http://127.0.0.1:11434/api/chat/completions \
   -H "Content-Type: application/json" \
   -d "$request")
 
